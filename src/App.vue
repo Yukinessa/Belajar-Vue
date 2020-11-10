@@ -1,60 +1,54 @@
 <template>
-  <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
-
-    <v-main>
-      <HelloWorld/>
-    </v-main>
-  </v-app>
+  <div id="app">
+    <Coba />
+    <input type="text" v-model="activity" />
+    <button @click="addNewTodo">submit</button>
+    <ul v-for="(todo,id) in todos" :key="id">
+      <li @click="deleteTodo(id)">{{todo}}</li>
+    </ul>
+    <ul v-for="(anime,id) in animes" :key="id">
+      <li>
+        <CardAnime :anime="anime" />
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+import Coba from "./components/Coba";
+import CardAnime from "./components/CardAnime";
 
 export default {
-  name: 'App',
-
+  name: "App",
   components: {
-    HelloWorld,
+    Coba,
+    CardAnime
   },
-
   data: () => ({
-    //
+    todos: [],
+    activity: "",
+    animes: []
   }),
+  methods: {
+    addNewTodo: function() {
+      if (this.activity !== "") {
+        this.todos = [...this.todos, this.activity];
+        this.activity = "";
+      }
+    },
+    deleteTodo: function(id) {
+      this.todos = this.todos.filter((todo, idx) => id != idx);
+    },
+    getTopAnime: function() {
+      fetch("https://api.jikan.moe/v3/top/anime")
+        .then(response => response.json())
+        .then(response => {
+          this.animes = response.top;
+        });
+    }
+  },
+  mounted() {
+    this.getTopAnime();
+  }
 };
 </script>
